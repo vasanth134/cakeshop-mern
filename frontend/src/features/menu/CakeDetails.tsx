@@ -99,7 +99,7 @@ function CakeDetails() {
         </div>
         <img
           className="w-full object-cover rounded-lg"
-          src={`http://localhost:3000/images/img/${cakeDetails?.image}`}
+          src={`http://localhost:3000/images/${cakeDetails?.image}`}
           alt="Cake"
         />
         <div className="font-thin italic pt-3 text-sm">

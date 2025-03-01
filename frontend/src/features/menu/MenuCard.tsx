@@ -15,7 +15,7 @@ function MenuCard({ menuItem }: { menuItem: cakeType }) {
     >
       {/* Image Section */}
       <img
-        src={`http://localhost:3000/images/img/${menuItem.image}`}
+        src={`http://localhost:3000/images/${menuItem.image}`}
         className="w-full h-48 sm:h-56 md:h-64 object-cover"
         alt={menuItem.name}
       />

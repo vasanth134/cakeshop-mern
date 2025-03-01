@@ -1,49 +1,55 @@
-import { useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
-import { getCakesGroupedByCategory } from '../../services/apiCakes';
+import { useEffect, useState } from "react";
+import { getFlavors } from "../../services/apiCakes";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
 
-interface TypeGroupedCakes{
-    category: string,
-    totalCakes: number
+// Define the expected structure of cake flavor data
+interface CakeFlavorData {
+  flavor: string;
+  count: number;
 }
 
 const CakeFlavorTypeChart = () => {
-    const [cakes, setCakes] = useState<TypeGroupedCakes[]|null>();
+  const [flavorData, setFlavorData] = useState<CakeFlavorData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await getCakesGroupedByCategory();
-                console.log(data)
-                setCakes(data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data: CakeFlavorData[] = await getFlavors();
+        if (!Array.isArray(data)) {
+          console.error("Invalid data format:", data);
+          setFlavorData([]); // Prevent errors
+        } else {
+          setFlavorData(data);
+        }
+      } catch (error) {
+        console.error("Error fetching flavor data:", error);
+        setFlavorData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        fetchData();
-    }, []);
+    fetchData();
+  }, []);
 
-    const chartData = cakes?.map(cake => ({
-        category: cake.category,
-        totalCakes: cake.totalCakes,
-    }));
+  if (loading) return <p>Loading chart...</p>;
 
-    const maxCakes = chartData && Math.max(...chartData.map(d => d.totalCakes));
-
-    return (
-        <div className="p-6 bg-white rounded-lg shadow-md">
-            <BarChart width={300} height={200} data={chartData}>
-                
-                <XAxis dataKey="category"/>
-                <YAxis ticks={ maxCakes ? [...Array(maxCakes + 1).keys()] : [1,2,3]} domain={[0, 'dataMax + 1']}  />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="totalCakes" fill="#fbcfe8" name="Number of Cakes"/>
-            </BarChart>
-        </div>
-    );
+  return (
+    <div>
+      {flavorData.length === 0 ? (
+        <p>No data available</p>
+      ) : (
+        <BarChart width={600} height={300} data={flavorData}>
+          <XAxis dataKey="flavor" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="count" fill="#8884d8" />
+        </BarChart>
+      )}
+    </div>
+  );
 };
 
-
-export default CakeFlavorTypeChart; 
+export default CakeFlavorTypeChart;
